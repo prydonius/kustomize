@@ -15,6 +15,7 @@ import (
 	"sigs.k8s.io/kustomize/api/internal/plugins/builtinconfig"
 	"sigs.k8s.io/kustomize/api/resid"
 	"sigs.k8s.io/kustomize/api/types"
+	"sigs.k8s.io/kustomize/kyaml/openapi"
 	"sigs.k8s.io/yaml"
 )
 
@@ -26,6 +27,9 @@ func LoadConfigFromCRDs(
 	ldr ifc.Loader, paths []string) (*builtinconfig.TransformerConfig, error) {
 	tc := builtinconfig.MakeEmptyConfig()
 	for _, path := range paths {
+		if err := openapi.AddSchemaFromFileUsingField(ldr.Root()+"/"+path, ""); err != nil {
+			panic(err)
+		}
 		content, err := ldr.Load(path)
 		if err != nil {
 			return nil, err
